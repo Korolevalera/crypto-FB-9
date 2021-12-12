@@ -29,7 +29,7 @@ def get_popular_big(bigrams, length): # визначення найпопуля�
         buf.pop(lst[-1])
     return lst
 
-def get_permutations(lst1, lst2): # створення перестановок
+def get_permutations(lst1, lst2): # створення перестановок  
     result = []
     perms = permutations(lst2) 
     for row in perms:
@@ -103,7 +103,7 @@ perms = get_permutations(popular_bir, PB) # перестановки виду Ш
 
 kek = []
 
-for per in perms: 
+for per in perms: # перетворення в список
     for elem in list(per.items()):
         kek.append(elem)
 
@@ -112,37 +112,57 @@ perms = list(set(kek)) # відкидання дублікатів
 comb = combinations(perms, 2) # вз'яття комбінацій для системи рівнянь y1 x1, y2 x2 
 
 keys = [] # (a, b)
+i = 0
+for c in comb: 
+    i +=1
+    keys.extend(solve_mod(c)) # обчислення ключів
+#print(i)
 
-for c in comb: keys.extend(solve_mod(c)) # обчислення ключів
 
-# неможливі біграми
-miss = ["юи","йи","оы", "эю", "яо", "эы", "уы", "ыю", "цщ", "иы", "ыы", "фь", "яы", "ьь","аь", "уь", "оь", "еь", "иь", "ыь", "эь", "юь", "яь", "йь", "кь", "хь", "ць", "ьа", "ьй", "ьу", "ьы", "ьл", "ьь", "йй", "шш", "щщ", "ыы", "ээ"]
+def analyze(text):
+    # неможливі біграми
+    miss = ['ьь','аы','аь','чщ','йь','оы','уы','уь']
+    ABC1 = 'бвгджзклмнпрстфхцчшщ' # алфавіт
+    ABC2 = 'аеиоуыэюя' # алфавіт
+
+    if text == "":# пустий текст
+        return False
+    for i in range(len(text)-10): # перевірка на 5 приголосних підряд фбо 5 голосних підряд
+        if (text[i] in ABC1) and (text[i+1] in ABC1) and (text[i+2] in ABC1) and (text[i+3] in ABC1) and (text[i+4] in ABC1):
+            return False
+        if (text[i] in ABC2) and (text[i+1] in ABC2) and (text[i+2] in ABC2) and (text[i+3] in ABC2) and (text[i+4] in ABC2):
+            return False
+
+    for m in miss:# неможливі біграми
+        if m in text:
+            return False
+
+    return True
+
 
 file = open("keys.txt", "w")
 
 for key in list(set(keys)): # перебір можливих ключів
     maybetext = ""
-    check = False
-    for big in bigrams[:30]: # взяття перших 30 біграм
+    for big in bigrams[:90]: # взяття перших 30 біграм
         try:
             decode(big, key[0], key[1]) # спроба задекодить
         except:
             check = True
         else:
             maybetext += decode(big, key[0], key[1]) # зберігання тексту
-    if check: continue
-    for x in miss:
-        if x in maybetext: 
-            check = True
+
+    if analyze(maybetext):
+        print(f"({key[0]},{key[1]}) ",maybetext)
+        ans = input("Enter y if it`s correct >>")
+        if ans == "y":
             break
-    if check: continue    
-    file.write( f"({key[0]},{key[1]}) " + maybetext + "\n")
-file.close()
 
-a = int(input("ENTER a >> "))
-b = int(input("ENTER b >> "))
+if ans == "y":
+    a = int(key[0])
+    b = int(key[1])
 
-new_text = ""
-for big in bigrams:
-    new_text += decode(big, a, b) # ключ 654 / 777
-print(new_text)
+    new_text = ""
+    for big in bigrams:
+        new_text += decode(big, a, b) # ключ 654 / 777
+    print(new_text)

@@ -230,6 +230,15 @@ def main():
         print("Redundant:")
         print(redundant(h2_with_intersec, rus_alphabet, is_space_allowed, True))
 
+def Lab2():
+    new_context = ''
+    with open_text('dyuma.txt', False) as context:
+        new_context = context
+    new_text = open('dyuma2.txt', 'w')
+    new_text.write(new_context)
+    new_text.close()
+
 if __name__ == '__main__':
-    main()
+    #main()
+    Lab2()
     
